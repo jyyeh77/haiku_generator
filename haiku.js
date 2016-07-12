@@ -5,6 +5,8 @@ var dictionary = './cmudict.txt';
 function createHaiku(structure, syllablesArr){
   console.log("this should log a haiku with this structure: " + structure);
   var arrofWords;
+  var wordHolder;
+  var regex = /(\(\d\))$/;
 
   // allows for words of random syllable count in each haiku line
   // still abiding by haiku structure
@@ -24,7 +26,11 @@ function createHaiku(structure, syllablesArr){
       arrofWords = syllablesArr[syllables];
 
       // returns random word in array containing words with select # of syllables
-      return arrofWords[Math.floor(Math.random() * arrofWords.length)];
+      wordHolder = arrofWords[Math.floor(Math.random() * arrofWords.length)];
+      if (regex.test(wordHolder)){
+        wordHolder = wordHolder.replace(regex, "");
+      }
+      return wordHolder;
 
     }).join(' ');
   }).join('\n');
