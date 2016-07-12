@@ -7,11 +7,12 @@ function createHaiku(structure){
 
 }
 
-function parseDictionary(file){
+function syllableOrganizer(file){
 
   var wordsAndSyllablesArray = dictionaryToArray(dictionary);
   var regex = /[^0-9]/g;
   var wordObj = {};
+  var syllableArray = [];
 
   wordsAndSyllablesArray.forEach(function(index){
 
@@ -22,8 +23,17 @@ function parseDictionary(file){
       wordObj[index[0]] = index[1].replace(regex, "").length;
     }
   });
-  
-  console.log(wordObj);
+
+  // creates an array for corresponding to each possible # of syllables inside syllableArray
+  for (var key in wordObj){
+    syllableArray[wordObj[key]] = [];
+  }
+
+  // groups words based on # of syllables, all 1 syllable words go into syllableArray[1] etc..
+  for (var key in wordObj){
+    syllableArray[wordObj[key]].push(key);
+  }
+  return syllableArray;
 }
 
 function dictionaryToArray(file){
@@ -46,7 +56,7 @@ function dictionaryToArray(file){
 
 }
 
-parseDictionary(dictionary);
+syllableOrganizer(dictionary);
 
 
 // sets module.exports to reference custom object that points to createHaiku
