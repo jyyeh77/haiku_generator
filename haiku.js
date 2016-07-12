@@ -2,10 +2,82 @@ var fs = require('fs');
 var dictionary = './cmudict.txt';
 
 
-function createHaiku(structure){
-  console.log("this should log a haiku with this " + structure);
+function createHaiku(structure, syllablesArr){
+  console.log("this should log a haiku with this structure: " + structure);
+  var arrofWords;
+
+  // allows for words of random syllable count in each haiku line
+  // still abiding by haiku structure
+
+  var randomStructure = haikuScrambler(structure);
+
+
+  // iterates through each line of haiku
+  return randomStructure.map(function(lines){
+
+
+    // iterates through each element in each haiku line, with elements representing
+    // random syllable numbers that add up to the required # of syllables per line
+    return lines.map(function(syllables){
+
+      // assign arrays from syllable Array containing words with corresponding # of syllables to arrofWords
+      arrofWords = syllablesArr[syllables];
+
+      // returns random word in array containing words with select # of syllables
+      return arrofWords[Math.floor(Math.random() * arrofWords.length)];
+
+    }).join(' ');
+  }).join('\n');
+
 
 }
+
+// remakes haiku structure array to implement random syllable selection
+
+function haikuScrambler(arr){
+  var tempSyllables;
+  var syllablesLeft;
+  var scrambledArray = [];
+
+  // stores line number of each syllable count so that indices in scrambledArray
+  // reflect line number in haiku
+  var count = 0;
+
+
+  arr.forEach(function(lines){
+
+    // makes an array in scrambledArray for each element in input array
+  	scrambledArray[count] = [];
+
+
+    lines.forEach(function(syllables){
+    	innerCount = 0;
+    	syllablesLeft = syllables;
+
+      // checks that there are still syllables left to randomize
+    	while (syllablesLeft > 0){
+
+        // random # of syllables using # of syllables left
+    		babySyllable = Math.floor(Math.random() * syllablesLeft) + 1;
+
+        // updates # of syllables left in each line
+    		syllablesLeft = syllablesLeft - babySyllable;
+
+
+    		scrambledArray[count].push(babySyllable);
+    	}
+
+
+    	count++;
+    });
+  });
+
+  return scrambledArray;
+}
+
+
+// groups words by # of syllables into array such that array[n] only has words
+// that have n syllables
 
 function syllableOrganizer(file){
 
@@ -56,7 +128,6 @@ function dictionaryToArray(file){
 
 }
 
-syllableOrganizer(dictionary);
 
 
 // sets module.exports to reference custom object that points to createHaiku
@@ -64,4 +135,5 @@ syllableOrganizer(dictionary);
 
 module.exports = {
   createHaiku: createHaiku,
+  syllableOrganizer: syllableOrganizer,
 };
