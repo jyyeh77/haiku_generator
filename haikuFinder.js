@@ -102,7 +102,7 @@ function lineGenerator(start, syllables, fileArray, syllaArray){
   var arr = [];
   var textArray = textToArray(fileArray);
   var syllableCounter = 0;
-  var executed = false;
+
 
   // starts in random place in given text
   for (var i = start; i < textArray.length; i++){
@@ -120,7 +120,7 @@ function lineGenerator(start, syllables, fileArray, syllaArray){
       break;
     }
     else {
-      
+
       syllableCounter += findSyllableCount(textArray[i], syllaArray);
       arr.push(textArray[i]);
 
