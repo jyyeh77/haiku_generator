@@ -1,6 +1,7 @@
 var fs = require('fs');
 var dictionary = './cmudict.txt';
 
+/*<-------- Haiku Generator Function ------> */
 
 function createHaiku(structure, syllablesArr){
   console.log("this should log a haiku with this structure: " + structure);
@@ -37,6 +38,8 @@ function createHaiku(structure, syllablesArr){
 
 
 }
+
+/* <------- HELPER FUNCTIONS -------> */
 
 // remakes haiku structure array to implement random syllable selection
 
@@ -133,8 +136,6 @@ function dictionaryToArray(file){
   return wordSyllableArray;
 
 }
-
-
 
 // sets module.exports to reference custom object that points to createHaiku
 // could instead directly set createHaiku as property of module.exports object
