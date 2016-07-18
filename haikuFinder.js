@@ -3,6 +3,53 @@ var outsideText = './macbeth.txt';
 var haiku = require('./haiku');
 
 var syllablesArray = haiku.syllableOrganizer(haiku.dictionary);
+var macArray = textToArray(outsideText);
+
+// <------ Haiku Finder Function ------->
+
+function haikuScraper(structure, fileArray, syllaArray){
+  var textArray = textToArray(fileArray);
+  var haikuHolder = [];
+  var randomStart = Math.floor(Math.random() * textArray.length);
+  var counter = 0;      // stores current index of haikuHolder
+
+  for (var lines = 0; lines < structure.length; lines++){
+    for (var syllables = 0; syllables < structure[lines].length; syllables++){
+
+        // generates phrase that meets syllable limit for 1st haiku line
+        // starting at random location in text
+        if (lines === 0){
+          haikuHolder.push(lineGenerator(randomStart, structure[lines][syllables], fileArray, syllaArray));
+
+        }
+        else {
+
+          // retrieves index of last word in haikuHolder line that corresponds with index in textArray
+          startIndex = haikuHolder[counter][haikuHolder[counter].length-1];
+          counter++;
+
+          // if next line in haiku generated returns false, start haikuScraper again
+          if (conditionalLineGenerator(startIndex, structure[lines][syllables], fileArray, syllaArray) === false){
+
+            return haikuScraper(structure, fileArray, syllaArray);
+          }
+
+          // if next line in haiku meets syllable criteria, add to haikuHolder
+          else {
+            haikuHolder.push(conditionalLineGenerator(startIndex, structure[lines][syllables], fileArray, syllaArray));
+          }
+        }
+    }
+  }
+
+  // cleans up haikuHolder, removes numbers at end of each element
+  for (var i = 0; i < haikuHolder.length; i++){
+    haikuHolder[i].splice(haikuHolder[i].length-1, 1, '\n');
+  }
+  return haikuHolder.join('').replace(/,/g, ' ');
+}
+
+// <------- HELPER FUNCTIONS ------->
 
 function textToArray(file){
   var wordObj = {};
@@ -48,61 +95,67 @@ function findSyllableCount(word, syllaArray){
   return count;
 }
 
-function haikuScraper(structure, fileArray, syllaArray){
-  var textArray = textToArray(fileArray);
-  var haikuHolder = [];
-
-
-  /*return structure.map(function(line){
-    return lines.map(function(syllables){
-
-    })
-  })*/
-  for (var i = start; i < textArray.length; i++){
-
-
-    console.log(counter);
-
-    if (counter === 5 || findSyllableCount(textArray[i], syllaArray) === 0){
-      break;
-    }
-    haikuHolder.push(textArray[i]);
-    haikuHolder.push(findSyllableCount(textArray[i], syllaArray))
-    counter += findSyllableCount(textArray[i], syllaArray);
-  }
-
-  return haikuHolder;
-}
-
-function lineGenerator(syllables, fileArray, syllaArray){
+// generates phrases from Macbeth that are of a certain syllable length
+// starts over if word isn't in CMUdict.txt (if findSyllableCount returns 0) OR
+// if phrase is over the specified syllable count
+function lineGenerator(start, syllables, fileArray, syllaArray){
   var arr = [];
   var textArray = textToArray(fileArray);
-  var start = Math.floor(Math.random() * textArray.length);
   var syllableCounter = 0;
+  var executed = false;
 
-
+  // starts in random place in given text
   for (var i = start; i < textArray.length; i++){
+
+    // checks if phrase is over # syllables OR word isn't found in CMUdict
     if (syllableCounter > syllables || findSyllableCount(textArray[i], syllaArray)=== 0){
-      console.log("We recurse now")
-      return lineGenerator(syllables, fileArray, syllaArray);
+
+      // resets starting word in random place in text
+      start = Math.floor(Math.random() * textArray.length);
+      return lineGenerator(start, syllables, fileArray, syllaArray);
     }
     else if (syllableCounter === syllables){
+      // stores index in text as last element of array
+      arr.push(i);
+      break;
+    }
+    else {
+      
+      syllableCounter += findSyllableCount(textArray[i], syllaArray);
+      arr.push(textArray[i]);
+
+    }
+  }
+  return arr;
+}
+
+// same as lineGenerator(), but returns false if phrase exceeds syllable limit or
+// encounters word not in CMUdictionary, doesn't recurse
+function conditionalLineGenerator(start, syllables, fileArray, syllaArray){
+  var arr = [];
+  var textArray = textToArray(fileArray);
+  var syllableCounter = 0;
+
+  // starts in random place in given text
+  for (var i = start; i < textArray.length; i++){
+
+    // checks if phrase is over # syllables OR word isn't found in CMUdict
+    if (syllableCounter > syllables || findSyllableCount(textArray[i], syllaArray)=== 0){
+
+      return false;
+    }
+    else if (syllableCounter === syllables){
+      arr.push(i);
       break;
     }
     else {
       syllableCounter += findSyllableCount(textArray[i], syllaArray);
       arr.push(textArray[i]);
-      console.log(syllableCounter);
     }
-
   }
-
   return arr;
 }
 
-console.log(lineGenerator(5, outsideText, syllablesArray));
-//console.log(findSyllableCount('MACBETH', syllablesArray));
-//console.log(syllablesArray);
-//console.log(textToArray(outsideText));
-//console.log(Array.isArray(syllablesArray[1]));
-//console.log(matchArrays(outsideText, syllablesArray))
+// <----- MAIN ----->
+
+console.log(haikuScraper([[5],[7],[5]], outsideText, syllablesArray));
